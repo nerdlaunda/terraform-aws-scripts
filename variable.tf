@@ -27,22 +27,29 @@ variable "region" {
 }
 
 variable "pub-key-path" {
-    type = string
-    default = "./key.pub"
+  type    = string
+  default = "./key.pub"
 }
 variable "aws-shared-creds" {
-  type = string
+  type    = string
   default = "~/.aws/credentials"
 }
 
 variable "ami" {
-  type = map
+  type = map(any)
   default = {
-  "us-east-1" = "ami-087c17d1fe0178315"
+    "us-east-1"      = "ami-087c17d1fe0178315"
+    "us-east-2"      = "ami-0b59bfac6be064b78"
+    "us-west-1"      = "ami-0bdb828fd58c52235"
+    "us-west-2"      = "ami-a0cfeed8"
+    "ap-northeast-1" = "ami-0a4eaf6c4454eda75"
+    "ap-south-1"     = "ami-0912f71e06545ad88"
+    "ap-southeast-1" = "ami-08569b978cc4dfa10"
+    "ap-southeast-2" = "ami-09b42976632b27e9b"
   }
 }
 
 variable "instance-type" {
-    type = string
-    default = "t2.micro"
+  type    = string
+  default = "t2.micro"
 }

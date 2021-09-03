@@ -9,7 +9,7 @@ terraform {
 
 provider "aws" {
   region                  = var.region
-  shared_credentials_file = "${var.aws-shared-creds}"
+  shared_credentials_file = var.aws-shared-creds
 }
 
 resource "aws_key_pair" "webserver-key-pair" {
