@@ -37,14 +37,14 @@ Choose aws region
 
 ## Final Step : Execution
 
-1. Execute the command in the same directory.
-    _Prepare the required provides and initialize the directory._
+Execute the command in the same directory.
+1. _Prepare the required provides and initialize the directory._
     `terraform init`
 2. _Prepare the required plan and order of execution by dependency. This also refresh the current state_
     `terraform plan`
 3. _Execute and provision the resources._
     `terraform apply`
-4. A successful execution will show Private IP and Public IP of the instance. The instance (webserver) can be accessed from browser at <public-ip>:80
-SSH is also enabled by default. Which is available at port 22 of <public-ip> and accessible by private key.
+4. A successful execution will show Private IP and Public IP of the instance. The instance (webserver) can be accessed from browser at &lt;public-ip>:80
+SSH is also enabled by default. Which is available at port 22 of &lt;public-ip> and accessible by private key.
 
 > `terraform fmt` and `terraform validate` can be used to format/beautify the source code and validatation.
