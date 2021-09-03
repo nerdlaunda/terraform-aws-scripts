@@ -104,11 +104,12 @@ resource "aws_route" "public_internet_gateway" {
 }
 
 resource "aws_instance" "webserver" {
-  ami                         = "ami-087c17d1fe0178315"
+  #ami                         = "ami-087c17d1fe0178315"
+  ami                         = var.ami[var.region]
   subnet_id                   = aws_subnet.webserver_subnet.id
   vpc_security_group_ids      = ["${aws_security_group.sg-allow-web-ssh.id}"]
   key_name                    = aws_key_pair.webserver-key-pair.key_name
-  instance_type               = "t2.micro"
+  instance_type               = var.instance-type
   associate_public_ip_address = true
   user_data                   = <<EOT
     #!/usr/bin
@@ -127,4 +128,8 @@ resource "aws_instance" "webserver" {
 
 output "Public-IP" {
   value = aws_instance.webserver.public_ip
+}
+
+output "Private-IP" {
+  value = aws_instance.webserver.private_ip
 }

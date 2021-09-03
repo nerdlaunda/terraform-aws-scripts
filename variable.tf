@@ -34,3 +34,15 @@ variable "aws-shared-creds" {
   type = string
   default = "~/.aws/credentials"
 }
+
+variable "ami" {
+  type = map
+  default = {
+  "us-east-1" = "ami-087c17d1fe0178315"
+  }
+}
+
+variable "instance-type" {
+    type = string
+    default = "t2.micro"
+}
