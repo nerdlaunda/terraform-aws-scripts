@@ -88,16 +88,16 @@ resource "aws_internet_gateway" "gw" {
   }
 }
 
-resource "aws_route_table" "webserver-rt" {
-  vpc_id = aws_vpc.webserver-vpc.id
-  tags = {
-    Name      = "webserver-rt"
-    "project" = "webserver"
-  }
-}
+# resource "aws_route_table" "webserver-rt" {
+#   vpc_id = aws_vpc.webserver-vpc.id
+#   tags = {
+#     Name      = "webserver-rt"
+#     "project" = "webserver"
+#   }
+# }
 
 resource "aws_route" "public_internet_gateway" {
-  route_table_id         = aws_route_table.webserver-rt.id
+  route_table_id         = aws_vpc.webserver-vpc.default_route_table_id
   destination_cidr_block = "0.0.0.0/0"
   gateway_id             = aws_internet_gateway.gw.id
 }
@@ -113,6 +113,15 @@ resource "aws_instance" "webserver" {
   key_name                    = aws_key_pair.webserver-key-pair.key_name
   instance_type               = "t2.micro"
   associate_public_ip_address = true
+  user_data = <<EOT
+    #!/usr/bin
+    sudo iptables -A OUTPUT -p tcp --sport 22 -j ACCEPT
+    sudo yum update -y
+    sudo yum install httpd -y
+    sudo systemctl start httpd
+    sudo systemctl enable httpd 
+    sudo iptables -A OUTPUT -p tcp --sport 80 -j ACCEPT
+  EOT
   tags = {
     "name"    = "webserver-instance"
     "project" = "webserver"
