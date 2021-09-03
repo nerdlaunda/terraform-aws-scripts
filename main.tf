@@ -8,24 +8,24 @@ terraform {
 }
 
 provider "aws" {
-  region                  = "us-east-1"
-  shared_credentials_file = "~/.aws/credentials"
+  region                  = var.region
+  shared_credentials_file = "${var.aws-shared-creds}"
 }
 
 resource "aws_key_pair" "webserver-key-pair" {
   key_name   = "webserver-key"
-  public_key = file("./key.pub")
+  public_key = file("${var.pub-key-path}")
   tags = {
     "name"    = "webserver-key"
-    "project" = "web-deploy"
+    "project" = var.project-name
   }
 }
 
 resource "aws_vpc" "webserver-vpc" {
-  cidr_block = "172.20.0.0/16"
+  cidr_block = var.cidr["vpc"]
   tags = {
     "name"    = "webserver-vpc"
-    "project" = "web-deploy"
+    "project" = var.project-name
   }
 }
 
@@ -37,7 +37,7 @@ resource "aws_security_group" "sg-allow-web-ssh" {
 
   tags = {
     "name"    = "webserver-sg"
-    "project" = "web-deploy"
+    "project" = var.project-name
   }
 }
 
@@ -71,11 +71,11 @@ resource "aws_security_group_rule" "egress-rule-all" {
 
 resource "aws_subnet" "webserver_subnet" {
   vpc_id     = aws_vpc.webserver-vpc.id
-  cidr_block = "172.20.10.0/24"
+  cidr_block = var.cidr["subnet"]
 
   tags = {
     "name"    = "webserver-subnet"
-    "project" = "web-deploy"
+    "project" = var.project-name
   }
 }
 
@@ -84,10 +84,11 @@ resource "aws_internet_gateway" "gw" {
 
   tags = {
     Name      = "webserver-ig"
-    "project" = "webserver"
+    "project" = var.project-name
   }
 }
-
+# Not required to create new route table rather add rule to existing default
+# route table which get created with vpc
 # resource "aws_route_table" "webserver-rt" {
 #   vpc_id = aws_vpc.webserver-vpc.id
 #   tags = {
@@ -102,10 +103,6 @@ resource "aws_route" "public_internet_gateway" {
   gateway_id             = aws_internet_gateway.gw.id
 }
 
-output "Public-IP" {
-  value = aws_instance.webserver.public_ip
-}
-
 resource "aws_instance" "webserver" {
   ami                         = "ami-087c17d1fe0178315"
   subnet_id                   = aws_subnet.webserver_subnet.id
@@ -113,7 +110,7 @@ resource "aws_instance" "webserver" {
   key_name                    = aws_key_pair.webserver-key-pair.key_name
   instance_type               = "t2.micro"
   associate_public_ip_address = true
-  user_data = <<EOT
+  user_data                   = <<EOT
     #!/usr/bin
     sudo iptables -A OUTPUT -p tcp --sport 22 -j ACCEPT
     sudo yum update -y
@@ -124,6 +121,10 @@ resource "aws_instance" "webserver" {
   EOT
   tags = {
     "name"    = "webserver-instance"
-    "project" = "webserver"
+    "project" = var.project-name
   }
+}
+
+output "Public-IP" {
+  value = aws_instance.webserver.public_ip
 }
