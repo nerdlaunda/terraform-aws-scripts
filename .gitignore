@@ -1,0 +1,7 @@
+.credfile
+*.tfstate*
+.terraform/*
+*.lock*
+cred.file
+key
+key.pub
